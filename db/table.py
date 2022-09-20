@@ -53,3 +53,14 @@ class Tags(Base):
     def __init__(self, name, description: str = ""):
         self.name = name
         self.description = description
+
+
+class Metric(Base):
+    __tablename__ = 'metric'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+    description = Column(String)
+
+    def __init__(self, name, description: str = ""):
+        self.name = name
+        self.description = description
