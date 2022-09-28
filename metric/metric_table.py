@@ -5,19 +5,20 @@ from datetime import datetime, timedelta
 
 class TableMetric():
     def __init__(self,
-                 data_source: pd.DataFrame,
-                 load_plan: list,
-                 operation_column: list[str],
+                 data_source: pd.DataFrame = None,
+                 load_plan: list = None,
+                 operation_column: list[str] = None,
                  start_time: datetime = None,
                  time_column: str = 'time',
                  index_name: list[str] = ['alias', 'metric'],
                  offset_left: int = 0,
                  offset_right: int = 0):
+        self.metric_name = None
         self.data_source = data_source
-        self.data_sla = {}
-        self.data_metric = {}
-        self.data_metric_assemble = None
-        self.data_sla_assemble = {}
+        self.data_sla: dict[pd.Series] = {}
+        self.data_metric: dict[pd.Series] = {}
+        self.data_metric_assemble: pd.DataFrame = None
+        self.data_sla_assemble: dict[pd.DataFrame] = {}
         self.load_plan = load_plan
         self.operation_column = operation_column
         self.operation_name = data_source[operation_column].drop_duplicates().to_records(index=False)
@@ -37,7 +38,7 @@ class TableMetric():
             yield alias_level, load_level, shift_level, duration_level
             shift_level += up_time + hold_time
 
-    def __get_alias_level(self):
+    def get_alias_level(self):
         return [level[0] for level in self.load_plan]
 
     def metric(self,
@@ -46,6 +47,7 @@ class TableMetric():
                rename: str = None,
                func=np.average):
         rename = rename if rename else metric_name
+        self.metric_name = rename
         for alias_level, load_level, shift_level, duration_level in self.__get_shift_time_level_load():
             mask_time_start = self.data_source[self.time_column] >= self.start_time + timedelta(minutes=shift_level)
             mask_time_end = self.data_source[self.time_column] < self.start_time + timedelta(minutes=shift_level + duration_level)
@@ -58,9 +60,9 @@ class TableMetric():
             raise TypeError(f'Type {type(sla)} not support for sla data')
         elif isinstance(sla, pd.Series):
             self.data_sla[name] = {}
-            for alias_level in self.__get_alias_level():
+            for alias_level in self.get_alias_level():
                 if func is None:
-                    self.data_sla[name][alias_level] = sla.rename(name)
+                    self.data_sla[name][alias_level] = sla.rename((alias_level, name))
                 else:
                     self.data_sla[name][alias_level] = func(self.data_metric[alias_level], sla).rename((alias_level, name))
             return self.data_sla[name]
@@ -70,7 +72,7 @@ class TableMetric():
     def assemble_data_metric(self):
         if self.data_metric:
             self.data_metric_assemble = pd.concat([self.data_metric[alias_level]
-                                                   for alias_level in self.__get_alias_level()], axis=1)
+                                                   for alias_level in self.get_alias_level()], axis=1)
             self.data_metric_assemble.columns.set_names(self.index_name, inplace=True)
             return self.data_metric_assemble
         else:
@@ -79,7 +81,8 @@ class TableMetric():
     def assemble_data_sla(self, name: str):
         if self.data_sla:
             self.data_sla_assemble[name] = pd.concat([self.data_sla[name][alias_level]
-                                                      for alias_level in self.__get_alias_level()], axis=1)
+                                                      for alias_level in self.get_alias_level()], axis=1)
+            print(self.data_sla_assemble[name].columns)
             self.data_sla_assemble[name].columns.set_names(self.index_name, inplace=True)
             return self.data_sla_assemble[name]
         else:
