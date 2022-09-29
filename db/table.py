@@ -21,64 +21,89 @@ operation_tag_table = Table(
     Column("tag_id", ForeignKey("tag.id")),
 )
 
-
-class Profile(Base):
-    __tablename__ = 'profile'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    date = Column(DateTime(timezone=True), nullable=False)
-
-    def __init__(self, name, date):
-        self.name = name
-        self.date = date
+report_tag_table = Table(
+    "report_tag",
+    Base.metadata,
+    Column("report_id", ForeignKey("report.id")),
+    Column("tag_id", ForeignKey("tag.id")),
+)
 
 
 class Operation(Base):
     __tablename__ = 'operation'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, unique=True, nullable=False)
     description = Column(String)
 
-    def __init__(self, name, description):
+    def __init__(self, name: str, **kwargs: Any) -> None:
         self.name = name
-        self.description = description
+        for field, value in kwargs.items():
+            if self.__class__.__dict__[field] and field != 'id':
+                self.__setattr__(field, value)
 
 
 class Tag(Base):
     __tablename__ = 'tag'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, unique=True, nullable=False)
     description = Column(String)
 
-    def __init__(self, name, description: str = ""):
+    def __init__(self, name: str, **kwargs: Any) -> None:
         self.name = name
-        self.description = description
+        for field, value in kwargs.items():
+            if self.__class__.__dict__[field] and field != 'id':
+                self.__setattr__(field, value)
 
 
 class Metric(Base):
     __tablename__ = 'metric'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
+    name = Column(String, unique=True, nullable=False)
     description = Column(String)
 
-    def __init__(self, name, description: str = ""):
+    def __init__(self, name: str, **kwargs: Any) -> None:
         self.name = name
-        self.description = description
+        for field, value in kwargs.items():
+            if self.__class__.__dict__[field] and field != 'id':
+                self.__setattr__(field, value)
+
+    def __repr__(self) -> str:
+        return f"Metric('{self.id}', '{self.name}', '{self.description}')"
+
+
+class Profile(Base):
+    __tablename__ = 'profile'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, nullable=False)
+    date = Column(DateTime(timezone=True))
+    description = Column(String)
+
+    def __init__(self, name: str, date: datetime, **kwargs: Any) -> None:
+        self.name = name
+        self.date = date
+        for field, value in kwargs.items():
+            if self.__class__.__dict__[field] and field != 'id':
+                self.__setattr__(field, value)
 
 
 class ProfileOperation(Base):
     __tablename__ = 'profile_operation'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_profile = Column(Integer)
-    id_operation = Column(Integer)
-    id_metric = Column(Integer)
-    metric_value = Column(String)
+    id_profile = Column(Integer, ForeignKey("profile.id"), nullable=False)
+    id_operation = Column(Integer, ForeignKey("operation.id"), nullable=False)
+    id_metric = Column(Integer, ForeignKey("metric.id"), nullable=False)
+    metric_value = Column(String, nullable=False)
+
+    def __init__(self, **kwargs: Any) -> None:
+        for field, value in kwargs.items():
+            if self.__class__.__dict__[field] and field != 'id':
+                self.__setattr__(field, value)
 
 
 class Report(Base):
     __tablename__ = 'report'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_profile = Column(Integer, ForeignKey("profile.id"), nullable=True)
+    id_profile = Column(Integer, ForeignKey("profile.id"))
     name = Column(String, nullable=False)
     date = Column(DateTime(timezone=True), nullable=False)
     description = Column(String)
@@ -91,12 +116,16 @@ class Report(Base):
                 self.__setattr__(field, value)
 
 
-
 class ReportOperation(Base):
     __tablename__ = 'report_operation'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_report = Column(Integer, ForeignKey("report.id"))
-    id_operation = Column(Integer, ForeignKey("operation.id"))
-    id_metric = Column(Integer, ForeignKey("metric.id"))
-    metric_value = Column(String)
+    id_report = Column(Integer, ForeignKey("report.id"), nullable=False)
+    id_operation = Column(Integer, ForeignKey("operation.id"), nullable=False)
+    id_metric = Column(Integer, ForeignKey("metric.id"), nullable=False)
+    metric_value = Column(String, nullable=False)
     alias = Column(String)
+
+    def __init__(self, **kwargs: Any) -> None:
+        for field, value in kwargs.items():
+            if self.__class__.__dict__[field] and field != 'id':
+                self.__setattr__(field, value)
