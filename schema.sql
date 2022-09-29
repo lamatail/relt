@@ -1,9 +1,3 @@
-CREATE TABLE "profile" (
-  "id" SERIAL PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL,
-  "date" timestamp
-);
-
 CREATE TABLE "operation" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL,
@@ -22,28 +16,35 @@ CREATE TABLE "metric" (
   "description" varchar
 );
 
+CREATE TABLE "profile" (
+  "id" SERIAL PRIMARY KEY,
+  "name" varchar UNIQUE NOT NULL,
+  "date" timestamp,
+  "description" varchar
+);
+
 CREATE TABLE "profile_operation" (
   "id" SERIAL PRIMARY KEY,
-  "id_report" int,
-  "id_operation" int,
-  "id_metric" int,
-  "metric_value" float
+  "id_profile" int NOT NULL,
+  "id_operation" int NOT NULL,
+  "id_metric" int NOT NULL,
+  "metric_value" float NOT NULL
 );
 
 CREATE TABLE "report" (
   "id" SERIAL PRIMARY KEY,
   "id_profile" int,
-  "name" varchar,
-  "date" timestamp,
+  "name" varchar NOT NULL,
+  "date" timestamp NOT NULL,
   "description" varchar
 );
 
 CREATE TABLE "report_operation" (
   "id" SERIAL PRIMARY KEY,
-  "id_report" int,
-  "id_operation" int,
-  "id_metric" int,
-  "metric_value" float,
+  "id_report" int NOT NULL,
+  "id_operation" int NOT NULL,
+  "id_metric" int NOT NULL,
+  "metric_value" float NOT NULL,
   "alias" varchar
 );
 
@@ -81,8 +82,7 @@ ALTER TABLE "report_tag" ADD FOREIGN KEY ("report_id") REFERENCES "report" ("id"
 
 ALTER TABLE "report_tag" ADD FOREIGN KEY ("tag_id") REFERENCES "tag" ("id");
 
-
-ALTER TABLE "profile_operation" ADD FOREIGN KEY ("id_report") REFERENCES "operation" ("id");
+ALTER TABLE "profile_operation" ADD FOREIGN KEY ("id_profile") REFERENCES "profile" ("id");
 
 ALTER TABLE "profile_operation" ADD FOREIGN KEY ("id_operation") REFERENCES "operation" ("id");
 
