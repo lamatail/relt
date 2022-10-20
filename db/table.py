@@ -41,6 +41,14 @@ class Operation(Base):
             if self.__class__.__dict__[field] and field != 'id':
                 self.__setattr__(field, value)
 
+    def __repr__(self) -> str:
+        return f"Operation('{self.name}')"
+
+    def __eq__(self, other):
+        return self.name.lower() == other.name.lower()
+
+    def __hash__(self):
+        return hash((self.name[0].lower(),))
 
 class Tag(Base):
     __tablename__ = 'tag'
@@ -115,6 +123,8 @@ class Report(Base):
             if self.__class__.__dict__[field] and field != 'id':
                 self.__setattr__(field, value)
 
+    def __repr__(self) -> str:
+        return f"Report('{self.id}', '{self.id_profile}', '{self.name}', '{self.date}', '{self.description}')"
 
 class ReportOperation(Base):
     __tablename__ = 'report_operation'
