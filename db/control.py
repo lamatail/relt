@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
 from db.table import *
+from metric.analysis import LoadMetric
 from metric.metric_table import TableMetric
 from psycopg2 import errors
 
@@ -81,7 +82,7 @@ def delete_tables():
     None
 
 
-def add_report_operation(session, table_metric: TableMetric, id_report):
+def add_report_operation(session, table_metric: LoadMetric, id_report):
     for alias in table_metric.get_alias_level():
         for operation, value in table_metric.data_metric[alias].items():
             report = ReportOperation()
@@ -106,7 +107,7 @@ def add_report_operation(session, table_metric: TableMetric, id_report):
     session.commit()
 
 
-def build_table_metric(session, report_name: Union[str, int]) -> TableMetric:
+def build_table_metric(session, report_name: Union[str, int]) -> LoadMetric:
     if isinstance(report_name, int):
         id_report = session.query(Report).filter(Report.id == report_name).one().id
     elif isinstance(report_name, str):

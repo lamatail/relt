@@ -50,6 +50,7 @@ class Operation(Base):
     def __hash__(self):
         return hash((self.name[0].lower(),))
 
+
 class Tag(Base):
     __tablename__ = 'tag'
     id = Column(Integer, primary_key=True)
@@ -125,6 +126,7 @@ class Report(Base):
 
     def __repr__(self) -> str:
         return f"Report('{self.id}', '{self.id_profile}', '{self.name}', '{self.date}', '{self.description}')"
+
 
 class ReportOperation(Base):
     __tablename__ = 'report_operation'
