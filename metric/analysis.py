@@ -15,7 +15,8 @@ class LoadMetric(ABC):
         self.data_metric: dict[dict[pd.Series]] = {}
         self.data_metric_assemble: pd.DataFrame = None
         self.operation_column = operation_column
-        self.operation_name = None
+        self.operation_name = N1
+        one
         self.start_time = None
         self.time_column = time_column
         self.index_name = index_name

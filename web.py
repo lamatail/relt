@@ -64,3 +64,13 @@ def generate_profile():
                              influx_user=TDB_PROD_USER,
                              influx_pwd=TDB_PROD_PWD,
                              influx_db=TDB_PROD_INST)
+
+@app.route("/load/plan", methods=['POST'])
+def add_plan():
+    if request.method == 'POST':
+        req_json = request.json
+
+@app.route("/load/plan", methods=['GET'])
+def get_plan():
+    if request.method == 'POST':
+        req_json = request.json

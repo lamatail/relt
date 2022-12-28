@@ -24,9 +24,10 @@ DEFAULT_METRICS = [
     Metric(name='per95', description='95 персентиль времени обработки запроса'),
     Metric(name='rps', description='количество запросов в секунду'),
     Metric(name='rpm', description='количество запросов в минуту'),
-    Metric(name='rp5m', description='количество запросов в 5 минту'),
-    Metric(name='rp10m', description='количество запросов в 10 минут'),
-    Metric(name='rph', description='количество запросов в час')
+    Metric(name='rph', description='количество запросов в час'),
+    Metric(name='max.perf.rps', description='максимальное кол-во запросов'),
+    Metric(name='max.perf.rpm', description='максимальное кол-во запросов'),
+    Metric(name='max.perf.rph', description='максимальное кол-во запросов')
 ]
 
 
